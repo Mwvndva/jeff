@@ -25,28 +25,42 @@
       cursor: none;
     }
 
-    /* FIX 1: canvas sits at z-index 0 (background), video at z-index 1 (above it) */
+    /* LAYERING: canvas = background, video = above canvas */
     .card-canvas {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 0;
+      display: block;
     }
 
     .card video {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      z-index: 1;
-      /* start grayscale, go full colour on active card */
-      filter: grayscale(100%);
+      z-index: 2;
+      display: block;
+      filter: grayscale(80%);
       transition: filter 0.6s ease;
     }
 
-    /* FIX 2: only the active card's video goes full colour */
     .card.active video {
       filter: grayscale(0%);
+    }
+
+    .card:not(.active) video {
+      filter: grayscale(80%);
+    }
+
+    /* fade canvas out once video is playing */
+    .card.video-ready .card-canvas {
+      opacity: 0;
+      transition: opacity 0.5s ease;
     }
 
     /* CURSOR */
@@ -593,12 +607,22 @@
     function syncVideos(activeIdx) {
       document.querySelectorAll('.card video').forEach((vid, i) => {
         if (i === activeIdx) {
-          vid.play().catch(() => { }); // catch autoplay policy errors silently
+          vid.play().catch(() => { });
         } else {
           vid.pause();
         }
       });
     }
+
+    // Mark card as video-ready to fade out the canvas once video plays
+    document.querySelectorAll('.card video').forEach((vid) => {
+      const card = vid.closest('.card');
+      vid.addEventListener('canplay', () => {
+        card.classList.add('video-ready');
+      });
+      // If already ready (cached)
+      if (vid.readyState >= 3) card.classList.add('video-ready');
+    });
 
     // CAROUSEL
     const track = document.getElementById('track');
