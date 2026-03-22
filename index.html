@@ -25,6 +25,22 @@
       cursor: none;
     }
 
+    .card video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%);
+      transition: filter 0.5s ease;
+      z-index: 1;
+    }
+
+    .card:hover video {
+      filter: grayscale(0%);
+    }
+
     .cursor {
       position: fixed;
       width: 10px;
@@ -569,65 +585,25 @@
       <!-- CARD 1 -->
       <div class="card" data-i="0">
         <canvas class="card-canvas"></canvas>
-        <div class="card-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-text">LOADING</div>
-        </div>
-        <div class="ig-wrap">
-          <div class="ig-inner">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DSFMI34jTU7/"
-              data-instgrm-version="14" style="background:#000;border:0;border-radius:0;margin:0;padding:0;width:100%;">
-            </blockquote>
-          </div>
-        </div>
+        <video src="videos/cecafa.mp4" autoplay muted loop playsinline></video>
       </div>
 
       <!-- CARD 2 -->
       <div class="card" data-i="1">
         <canvas class="card-canvas"></canvas>
-        <div class="card-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-text">LOADING</div>
-        </div>
-        <div class="ig-wrap">
-          <div class="ig-inner">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DTfMKZngpdt/"
-              data-instgrm-version="14" style="background:#000;border:0;border-radius:0;margin:0;padding:0;width:100%;">
-            </blockquote>
-          </div>
-        </div>
+        <video src="videos/polo club.mp4" autoplay muted loop playsinline></video>
       </div>
 
       <!-- CARD 3 -->
       <div class="card" data-i="2">
         <canvas class="card-canvas"></canvas>
-        <div class="card-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-text">LOADING</div>
-        </div>
-        <div class="ig-wrap">
-          <div class="ig-inner">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DQJTwWeDXyR/"
-              data-instgrm-version="14" style="background:#000;border:0;border-radius:0;margin:0;padding:0;width:100%;">
-            </blockquote>
-          </div>
-        </div>
+        <video src="videos/treatos.mp4" autoplay muted loop playsinline></video>
       </div>
 
       <!-- CARD 4 -->
       <div class="card" data-i="3">
         <canvas class="card-canvas"></canvas>
-        <div class="card-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-text">LOADING</div>
-        </div>
-        <div class="ig-wrap">
-          <div class="ig-inner">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DV3E9hpAu89/"
-              data-instgrm-version="14" style="background:#000;border:0;border-radius:0;margin:0;padding:0;width:100%;">
-            </blockquote>
-          </div>
-        </div>
+        <video src="videos/wrc2026.mp4" autoplay muted loop playsinline></video>
       </div>
 
       <!-- CARD 5 -->
@@ -705,8 +681,6 @@
     </div>
   </div>
 
-  <!-- Instagram embed script -->
-  <script async defer crossorigin="anonymous" src="https://www.instagram.com/embed.js"></script>
 
   <script>
     // ── CURSOR ───────────────────────────────────────────
@@ -759,64 +733,6 @@
       });
     });
 
-    // Force processing of Instagram embeds once script is ready
-    function triggerIG() {
-      if (window.instgrm) {
-        window.instgrm.Embeds.process();
-      } else {
-        setTimeout(triggerIG, 200);
-      }
-    }
-    triggerIG();
-
-    // Hide loader once IG embeds fire, or use fallback if they fail
-    function watchLoaders() {
-      document.querySelectorAll('.card').forEach(card => {
-        const loader = card.querySelector('.card-loader');
-        const igWrap = card.querySelector('.ig-wrap');
-        const bq = card.querySelector('blockquote');
-        const url = bq?.dataset.instgrmPermalink;
-
-        if (card.querySelector('iframe')) {
-          loader.classList.add('hidden');
-          return;
-        }
-
-        // Mutation observer to detect iframe injection
-        const mo = new MutationObserver(() => {
-          if (card.querySelector('iframe')) {
-            loader.classList.add('hidden');
-            mo.disconnect();
-          }
-        });
-        mo.observe(card, { childList: true, subtree: true });
-
-        // Fallback: If no iframe after 5 seconds, use a direct link + thumbnail
-        setTimeout(() => {
-          if (!card.querySelector('iframe')) {
-            mo.disconnect();
-            loader.classList.add('hidden');
-
-            // Extraction of shortcode for thumbnail
-            const match = url?.match(/\/reel\/([^\/]+)/);
-            const shortcode = match ? match[1] : '';
-            const thumbUrl = `https://www.instagram.com/p/${shortcode}/media/?size=l`;
-
-            igWrap.innerHTML = `
-              <a href="${url}" target="_blank" class="ig-fallback-link" style="display:block;width:100%;height:100%;position:relative;text-decoration:none;">
-                <img src="${thumbUrl}" alt="Instagram Reel" style="width:100%;height:100%;object-fit:cover;">
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);">
-                  <svg viewBox="0 0 24 24" style="width:50px;fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
-                </div>
-                <div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:2px;color:#fff;background:rgba(0,0,0,0.6);padding:8px 16px;border-radius:20px;">WATCH ON INSTAGRAM</div>
-              </a>
-            `;
-          }
-        }, 5000);
-      });
-    }
-
-    setTimeout(watchLoaders, 800);
 
     // ── CAROUSEL ─────────────────────────────────────────
     const track = document.getElementById('track');
