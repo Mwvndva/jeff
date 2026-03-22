@@ -25,22 +25,31 @@
       cursor: none;
     }
 
+    /* FIX 1: canvas sits at z-index 0 (background), video at z-index 1 (above it) */
+    .card-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
     .card video {
       position: absolute;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: grayscale(100%);
-      transition: filter 0.5s ease;
       z-index: 1;
+      /* start grayscale, go full colour on active card */
+      filter: grayscale(100%);
+      transition: filter 0.6s ease;
     }
 
-    .card:hover video {
+    /* FIX 2: only the active card's video goes full colour */
+    .card.active video {
       filter: grayscale(0%);
     }
 
+    /* CURSOR */
     .cursor {
       position: fixed;
       width: 10px;
@@ -62,10 +71,7 @@
     body::after {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 9000;
@@ -118,10 +124,7 @@
     /* CAROUSEL */
     .stage {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       display: flex;
       align-items: center;
       z-index: 10;
@@ -132,7 +135,6 @@
       display: flex;
       align-items: center;
       gap: 28px;
-      /* padding centres first card */
       padding: 0 calc(50vw - 220px);
       transition: transform 0.72s cubic-bezier(0.77, 0, 0.175, 1);
       will-change: transform;
@@ -149,8 +151,7 @@
       cursor: none;
       transform: scale(0.86) translateY(22px);
       opacity: 0.3;
-      transition: transform 0.72s cubic-bezier(0.77, 0, 0.175, 1),
-        opacity 0.72s ease;
+      transition: transform 0.72s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.72s ease;
       background: #0d0d0d;
     }
 
@@ -164,125 +165,7 @@
       opacity: 0.55;
     }
 
-    /* Instagram embed container */
-    .ig-wrap {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      background: #0d0d0d;
-    }
-
-    /* 
-    Instagram's blockquote embed renders at ~400px wide natively.
-    We scale + clip it to fill the card perfectly.
-  */
-    .ig-wrap .ig-inner {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1.08);
-      transform-origin: center center;
-      width: 100%;
-      /* Let IG script control height — we clip via parent overflow:hidden */
-    }
-
-    /* Hide IG branding chrome on inactive cards */
-    .card:not(.active) .ig-wrap {
-      pointer-events: none;
-    }
-
-    /* Loading state */
-    .card-loader {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      z-index: 2;
-      background: #0d0d0d;
-      transition: opacity 0.5s;
-    }
-
-    .card-loader.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .loader-ring {
-      width: 36px;
-      height: 36px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-top-color: rgba(255, 255, 255, 0.6);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .loader-text {
-      font-size: 10px;
-      letter-spacing: 4px;
-      color: rgba(255, 255, 255, 0.25);
-    }
-
-    /* Canvas bg (shows while IG loads) */
-    .card-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1;
-    }
-
-    /* Bottom info bar */
-    .card-info {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 40px 24px 24px;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
-      z-index: 5;
-      transform: translateY(8px);
-      opacity: 0;
-      transition: opacity 0.4s 0.12s, transform 0.4s 0.12s;
-      pointer-events: none;
-    }
-
-    .card.active .card-info {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .info-brand {
-      font-size: 10px;
-      letter-spacing: 4px;
-      color: rgba(255, 255, 255, 0.45);
-      margin-bottom: 5px;
-    }
-
-    .info-title {
-      font-size: 30px;
-      letter-spacing: 2px;
-      color: #fff;
-      line-height: 1;
-    }
+    /* Canvas placeholder z-index already set above */
 
     /* ARROWS */
     .arrow {
@@ -315,6 +198,7 @@
       stroke-width: 1.5;
     }
 
+    /* FIX 3: left arrow positioned clearly to the right of the stats panel */
     .arrow-left {
       left: 310px;
     }
@@ -366,7 +250,7 @@
       }
     }
 
-    /* ── STATS PANEL — LEFT SIDE ───────────────────────── */
+    /* STATS PANEL — LEFT */
     .stats-panel {
       position: fixed;
       left: 44px;
@@ -399,7 +283,6 @@
       animation-delay: 0.7s;
     }
 
-    /* horizontal rule between items */
     .stat-item+.stat-item::before {
       content: '';
       position: absolute;
@@ -417,7 +300,6 @@
       }
     }
 
-    /* the big number row */
     .stat-top {
       display: flex;
       align-items: flex-end;
@@ -434,7 +316,6 @@
       min-width: 2ch;
     }
 
-    /* countdown flicker — applied via JS class */
     .stat-num.counting {
       animation: digitFlicker 0.06s steps(1) infinite;
     }
@@ -456,7 +337,6 @@
     .stat-suffix {
       font-size: clamp(28px, 3vw, 44px);
       color: rgba(255, 255, 255, 0.4);
-      letter-spacing: 0;
       line-height: 1;
       padding-bottom: 6px;
     }
@@ -470,7 +350,6 @@
       margin-top: 6px;
     }
 
-    /* thin left accent line that grows down on load */
     .stat-accent {
       position: absolute;
       left: -16px;
@@ -520,7 +399,7 @@
       }
 
       .track {
-        padding: 0 calc(50vw - 40vw);
+        padding: 0 10vw;
         gap: 16px;
       }
 
@@ -582,60 +461,38 @@
   <div class="stage">
     <div class="track" id="track">
 
-      <!-- CARD 1 -->
+      <!-- CARD 1 — FIX 4: spaces encoded as %20 in filenames -->
       <div class="card" data-i="0">
         <canvas class="card-canvas"></canvas>
-        <video src="videos/cecafa.mp4" autoplay muted loop playsinline></video>
+        <video src="videos/cecafa.mp4" autoplay muted loop playsinline preload="auto"></video>
       </div>
 
-      <!-- CARD 2 -->
+      <!-- CARD 2 — FIX 4: "polo club.mp4" → "polo%20club.mp4" -->
       <div class="card" data-i="1">
         <canvas class="card-canvas"></canvas>
-        <video src="videos/polo club.mp4" autoplay muted loop playsinline></video>
+        <video src="videos/polo%20club.mp4" autoplay muted loop playsinline preload="auto"></video>
       </div>
 
       <!-- CARD 3 -->
       <div class="card" data-i="2">
         <canvas class="card-canvas"></canvas>
-        <video src="videos/treatos.mp4" autoplay muted loop playsinline></video>
+        <video src="videos/treatos.mp4" autoplay muted loop playsinline preload="auto"></video>
       </div>
 
       <!-- CARD 4 -->
       <div class="card" data-i="3">
         <canvas class="card-canvas"></canvas>
-        <video src="videos/wrc2026.mp4" autoplay muted loop playsinline></video>
+        <video src="videos/wrc2026.mp4" autoplay muted loop playsinline preload="auto"></video>
       </div>
 
-      <!-- CARD 5 -->
+      <!-- CARD 5 — placeholder until video added -->
       <div class="card" data-i="4">
         <canvas class="card-canvas"></canvas>
-        <div class="card-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-text">LOADING</div>
-        </div>
-        <div class="ig-wrap">
-          <div class="ig-inner">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DUiEJbIjMbp/"
-              data-instgrm-version="14" style="background:#000;border:0;border-radius:0;margin:0;padding:0;width:100%;">
-            </blockquote>
-          </div>
-        </div>
       </div>
 
-      <!-- CARD 6 -->
+      <!-- CARD 6 — placeholder until video added -->
       <div class="card" data-i="5">
         <canvas class="card-canvas"></canvas>
-        <div class="card-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-text">LOADING</div>
-        </div>
-        <div class="ig-wrap">
-          <div class="ig-inner">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DTuhP3ZAoNh/"
-              data-instgrm-version="14" style="background:#000;border:0;border-radius:0;margin:0;padding:0;width:100%;">
-            </blockquote>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -653,7 +510,7 @@
   <div class="dots" id="dots"></div>
   <div class="hint">DRAG · SCROLL · ARROW KEYS</div>
 
-  <!-- STATS PANEL — LEFT -->
+  <!-- STATS PANEL -->
   <div class="stats-panel">
     <div class="stat-item">
       <div class="stat-accent"></div>
@@ -681,9 +538,8 @@
     </div>
   </div>
 
-
   <script>
-    // ── CURSOR ───────────────────────────────────────────
+    // CURSOR
     const cur = document.getElementById('cursor');
     document.addEventListener('mousemove', e => {
       cur.style.left = e.clientX + 'px';
@@ -694,7 +550,7 @@
       el.addEventListener('mouseleave', () => cur.classList.remove('big'));
     });
 
-    // ── CANVAS BG (cinematic placeholder while IG loads) ─
+    // CANVAS PLACEHOLDERS
     const palettes = [
       ['#080808', '#141410', '#0a0a08'],
       ['#06080a', '#0e1214', '#060808'],
@@ -733,14 +589,23 @@
       });
     });
 
+    // FIX 5: only autoplay the active video; pause others to save bandwidth
+    function syncVideos(activeIdx) {
+      document.querySelectorAll('.card video').forEach((vid, i) => {
+        if (i === activeIdx) {
+          vid.play().catch(() => { }); // catch autoplay policy errors silently
+        } else {
+          vid.pause();
+        }
+      });
+    }
 
-    // ── CAROUSEL ─────────────────────────────────────────
+    // CAROUSEL
     const track = document.getElementById('track');
     const cards = Array.from(document.querySelectorAll('.card'));
     const total = cards.length;
     let idx = 0;
 
-    // Build dots
     const dotsEl = document.getElementById('dots');
     document.getElementById('totN').textContent = total;
     cards.forEach((_, i) => {
@@ -762,6 +627,7 @@
       });
       document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
       document.getElementById('curN').textContent = idx + 1;
+      syncVideos(idx);
     }
 
     go(0);
@@ -801,24 +667,19 @@
 
     window.addEventListener('resize', () => go(idx));
 
-    // ── COUNTDOWN ANIMATION ──────────────────────────────
-    // Each stat counts DOWN from a big scrambled number to its real value
+    // COUNTDOWN ANIMATION
     function countdown(el) {
       const target = +el.dataset.target;
       const duration = 1600;
       const startVal = target * 3 + Math.floor(Math.random() * target * 2);
       const startTime = performance.now();
-
       el.classList.add('counting');
-
       function tick(now) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        // ease in-out quad — slow start, fast middle, slow finish
         const eased = progress < 0.5
           ? 2 * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-        // interpolate from startVal DOWN to target
         const current = Math.round(startVal - eased * (startVal - target));
         el.textContent = current;
         if (progress < 1) {
@@ -826,7 +687,6 @@
         } else {
           el.textContent = target;
           el.classList.remove('counting');
-          // final settle flash
           el.style.transition = 'opacity 0.1s';
           el.style.opacity = '0.4';
           setTimeout(() => { el.style.opacity = '1'; }, 100);
@@ -835,9 +695,7 @@
       requestAnimationFrame(tick);
     }
 
-    // Fire countdowns staggered after page load
-    const statNums = document.querySelectorAll('.stat-num');
-    statNums.forEach((el, i) => {
+    document.querySelectorAll('.stat-num').forEach((el, i) => {
       setTimeout(() => countdown(el), 700 + i * 280);
     });
   </script>
